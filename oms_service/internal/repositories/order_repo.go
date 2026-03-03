@@ -5,6 +5,7 @@ import (
 	"orderly/oms-service/internal/models"
 	"time"
 )
+var OrderCount uint = 3
 
 var Orders = []models.Order{
 	{
