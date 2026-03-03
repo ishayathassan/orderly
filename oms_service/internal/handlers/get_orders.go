@@ -8,5 +8,14 @@ import (
 )
 
 func GetOrders(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, repositories.Orders)
+
+	orders, err := repositories.GetAll()
+	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to retrieve orders from database",
+		})
+	}
+
+	c.JSON(http.StatusOK, orders)
 }

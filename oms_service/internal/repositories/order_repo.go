@@ -1,47 +1,30 @@
 package repositories
 
 import (
-	"errors"
+	"orderly/oms-service/internal/database"
 	"orderly/oms-service/internal/models"
-	"time"
 )
-var OrderCount uint = 3
 
-var Orders = []models.Order{
-	{
-		ID:        1,
-		UserID:    "user_99", // Context typically injected by the API Gateway
-		ItemName:  "Kubernetes in Action",
-		Quantity:  2,
-		Amount:    90.00,
-		Status:    "completed",
-		CreatedAt: time.Now().Add(-24 * time.Hour),
-	},
-	{
-		ID:        2,
-		UserID:    "user_42",
-		ItemName:  "Prometheus Guide",
-		Quantity:  1,
-		Amount:    45.50,
-		Status:    "pending",
-		CreatedAt: time.Now().Add(-2 * time.Hour),
-	},
-	{
-		ID:        3,
-		UserID:    "user_101",
-		ItemName:  "Mechanical Keyboard",
-		Quantity:  1,
-		Amount:    150.00,
-		Status:    "processing",
-		CreatedAt: time.Now(),
-	},
+func GetAll() ([]models.Order, error) {
+	var orders []models.Order
+	err := database.DB.Find(&orders).Error
+	return orders, err
 }
 
-func SearchOrder(id uint) (models.Order, error) {
-	for _, order := range Orders {
-		if order.ID == id {
-			return order, nil
-		}
-	}
-	return models.Order{}, errors.New("order not found")
+func GetByID(id uint) (models.Order, error) {
+	var order models.Order
+	err := database.DB.First(&order, id).Error
+	return order, err
+}
+
+func Create(order *models.Order) error {
+	return database.DB.Create(order).Error
+}
+
+func Delete(id uint) error {
+	return database.DB.Delete(&models.Order{}, id).Error
+}
+
+func Update(order models.Order) error {
+	return database.DB.Save(order).Error
 }
