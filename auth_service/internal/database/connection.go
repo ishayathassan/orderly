@@ -16,7 +16,7 @@ var DB *gorm.DB
 
 func InitDB() {
 
-    dsn := "host=localhost user=orderly-admin password=admin123 dbname=orderly_oms port=5432 sslmode=disable"
+    dsn := "host=localhost user=orderly-admin password=admin123 dbname=orderly_auth port=5432 sslmode=disable"
 
     var err error
     DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -27,14 +27,14 @@ func InitDB() {
     // Run migrations
     sqlDB, _ := DB.DB()
     driver, _ := migratepostgres.WithInstance(sqlDB, &migratepostgres.Config{})
-    
-    _, b, _, _ := runtime.Caller(0)
+
+	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 	migrationPath := filepath.ToSlash(filepath.Join(basepath, "migrations"))
 	sourceURL := "file://" + migrationPath
-
+    
     m, err := migrate.NewWithDatabaseInstance(
-        sourceURL,
+        sourceURL, 
         "postgres", 
         driver,
     )

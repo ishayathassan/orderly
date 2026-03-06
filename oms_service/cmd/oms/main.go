@@ -21,7 +21,3 @@ func main() {
 
 	router.Run("localhost:8080")
 }
-
-func initDB() {
-	panic("unimplemented")
-}
