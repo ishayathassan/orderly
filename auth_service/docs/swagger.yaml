@@ -1,0 +1,128 @@
+basePath: /
+definitions:
+  models.ErrorResponse:
+    properties:
+      code:
+        example: INVALID_REQUEST
+        type: string
+      message:
+        example: Invalid username or password
+        type: string
+    type: object
+  models.LoginRequest:
+    properties:
+      password:
+        example: Secret123!
+        type: string
+      username:
+        example: johndoe
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.LoginResponse:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  models.RegisterRequest:
+    properties:
+      password:
+        example: Secret123!
+        type: string
+      username:
+        example: johndoe
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RegisterResponse:
+    properties:
+      id:
+        example: 1a2b3c4d
+        type: string
+      role:
+        example: user
+        type: string
+      username:
+        example: johndoe
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://example.com/contact
+  description: This is the auth service for Orderly microservices.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://example.com/terms/
+  title: Orderly Auth Service API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login with username and password
+      parameters:
+      - description: Login Request
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful Login Example
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Invalid Request Example
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized Example
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: Register Request
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successful Registration Example
+          schema:
+            $ref: '#/definitions/models.RegisterResponse'
+        "400":
+          description: Invalid Request Example
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Username Already Exists Example
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Register user
+      tags:
+      - auth
+swagger: "2.0"

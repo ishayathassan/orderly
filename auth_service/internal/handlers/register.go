@@ -1,40 +1,45 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
-	"orderly/auth-service/internal/auth"
-	"orderly/auth-service/internal/database"
 	"orderly/auth-service/internal/models"
+	"orderly/auth-service/internal/services"
+	"orderly/auth-service/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Register user
+// @Description Create a new user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param register body models.RegisterRequest true "Register Request"
+// @Success 201 {object} models.RegisterResponse "Successful Registration Example"
+// @Failure 400 {object} models.ErrorResponse "Invalid Request Example"
+// @Failure 409 {object} models.ErrorResponse "Username Already Exists Example"
+// @Router /register [post]
 func Register(c *gin.Context) {
 	var req models.RegisterRequest
-
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid request format",
-		})
-	}
-
-	hashedPassword, err := auth.HashPassword(req.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Could not hash password",
-		})
-	}
-
-	newUser := models.User{
-		Username: req.Username,
-		Password: hashedPassword,
-		Role: "user",
-	}
-	if err := database.DB.Create(&newUser).Error; err != nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"message": "Username already exists",
-		})
+		utils.RespondError(c, http.StatusBadRequest, "INVALID_REQUEST", err.Error())
 		return
 	}
-	c.JSON(http.StatusCreated, newUser)
+
+	user, err := services.Register(req.Username, req.Password)
+	if err != nil {
+		if errors.Is(err, utils.ErrUsernameExists) {
+			utils.RespondError(c, http.StatusConflict, "USERNAME_EXISTS", "Username already exists")
+			return
+		}
+		utils.RespondError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Could not create user")
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.RegisterResponse{
+		ID:       user.ID.String(),
+		Username: user.Username,
+		Role:     user.Role,
+	})
 }

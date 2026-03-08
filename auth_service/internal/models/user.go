@@ -22,13 +22,3 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	u.ID = uuid.New()
 	return
 }
-
-type RegisterRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required,min=8"`
-}
-
-type LoginRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
