@@ -17,13 +17,18 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// BeforeCreate hook to generate UUIDs automatically
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	u.ID = uuid.New()
+	return
+}
+
 type RegisterRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required,min=8"`
 }
 
-// BeforeCreate hook to generate UUIDs automatically
-func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	u.ID = uuid.New()
-	return
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }

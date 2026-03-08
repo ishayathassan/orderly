@@ -13,7 +13,7 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/register", handlers.Register)
-	router.GET("/login", handlers.Login)
+	router.POST("/login", handlers.Login)
 
 
 	router.Run("localhost:8081")

@@ -14,7 +14,7 @@ func Register(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid req format",
+			"message": "Invalid request format",
 		})
 	}
 
