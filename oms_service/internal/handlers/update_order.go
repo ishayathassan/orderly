@@ -1,43 +1,44 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"orderly/oms-service/internal/models"
-	"orderly/oms-service/internal/repositories"
-	"time"
+	"orderly/oms-service/internal/services"
+	"orderly/oms-service/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Update an order
+// @Description Update an existing order by ID
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param id path uint true "Order ID"
+// @Param order body models.Order true "Updated order"
+// @Success 200 {object} models.Order
+// @Failure 400 {object} utils.ErrorResponse
+// @Failure 404 {object} utils.ErrorResponse
+// @Failure 500 {object} utils.ErrorResponse
+// @Router /orders/{id} [put]
 func UpdateOrder(c *gin.Context) {
 	orderID := c.MustGet("orderID").(uint)
 
 	var updatedOrder models.Order
-	if err := c.BindJSON(&updatedOrder); err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid Order format",
-		})
+	if err := c.ShouldBindJSON(&updatedOrder); err != nil {
+		utils.RespondError(c, http.StatusBadRequest, "INVALID_REQUEST", err.Error())
 		return
 	}
-	prevOrder, err := repositories.GetByID(orderID)
+
+	order, err := services.UpdateOrder(orderID, updatedOrder)
 	if err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Order not found",
-		})
+		if err == services.ErrOrderNotFound {
+			utils.RespondError(c, http.StatusNotFound, "ORDER_NOT_FOUND", "Order not found")
+			return
+		}
+		utils.RespondError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Could not update order")
+		return
 	}
 
-	updatedOrder.ID = orderID
-	updatedOrder.CreatedAt = prevOrder.CreatedAt
-	updatedOrder.UpdatedAt = time.Now() 
-
-	if err := repositories.Update(updatedOrder); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Could not update order",
-		})
-	}
-
-	c.JSON(http.StatusOK, updatedOrder)
+	c.JSON(http.StatusOK, order)
 }

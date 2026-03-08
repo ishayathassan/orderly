@@ -1,3 +1,17 @@
+// @title Orderly OMS API
+// @version 1.0
+// @description This is the Order Management Service for Orderly microservices.
+// @termsOfService http://example.com/terms/
+
+// @contact.name API Support
+// @contact.url http://example.com/contact
+// @contact.email support@example.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /
 package main
 
 import (
@@ -5,7 +19,11 @@ import (
 	"orderly/oms-service/internal/handlers"
 	"orderly/oms-service/internal/middlewares"
 
+	_ "orderly/oms-service/docs" // swagger generated docs
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
@@ -13,6 +31,9 @@ func main() {
 	database.InitDB()
 
 	router := gin.Default()
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	router.GET("/orders", handlers.GetOrders)
 	router.POST("/orders", handlers.CreateOrder)
 	router.GET("/orders/:id", middlewares.ValidateID(), handlers.GetOrderByID)

@@ -1,0 +1,189 @@
+basePath: /
+definitions:
+  models.Order:
+    properties:
+      amount:
+        example: 2500.5
+        type: number
+      created_at:
+        example: "2026-03-08T12:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      item_name:
+        example: Laptop
+        type: string
+      quantity:
+        example: 2
+        type: integer
+      status:
+        example: pending
+        type: string
+      updated_at:
+        example: "2026-03-08T12:00:00Z"
+        type: string
+      user_id:
+        example: "123"
+        type: string
+    required:
+    - amount
+    - item_name
+    - quantity
+    - user_id
+    type: object
+  utils.ErrorResponse:
+    properties:
+      code:
+        example: INVALID_REQUEST
+        type: string
+      message:
+        example: Something went wrong
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://example.com/contact
+  description: This is the Order Management Service for Orderly microservices.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://example.com/terms/
+  title: Orderly OMS API
+  version: "1.0"
+paths:
+  /orders:
+    get:
+      description: Retrieve all orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Example: [{\"id\":1,\"user_id\":\"123\",\"item_name\":\"Laptop\",\"quantity\":2,\"amount\":2500.50,\"status\":\"pending\",\"created_at\":\"2026-03-08T12:00:00Z\",\"updated_at\":\"2026-03-08T12:00:00Z\"}]'
+          schema:
+            items:
+              $ref: '#/definitions/models.Order'
+            type: array
+        "500":
+          description: Failed to retrieve orders
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Create an order with item details
+      parameters:
+      - description: Order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new order
+      tags:
+      - orders
+  /orders/{id}:
+    delete:
+      description: Delete an order by ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete an order
+      tags:
+      - orders
+    get:
+      description: Retrieve a single order by its ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get order by ID
+      tags:
+      - orders
+    put:
+      consumes:
+      - application/json
+      description: Update an existing order by ID
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update an order
+      tags:
+      - orders
+swagger: "2.0"

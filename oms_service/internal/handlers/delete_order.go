@@ -2,28 +2,32 @@ package handlers
 
 import (
 	"net/http"
-	"orderly/oms-service/internal/repositories"
+	"orderly/oms-service/internal/services"
+	"orderly/oms-service/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func DeleteOrder(c *gin.Context){
+// @Summary Delete an order
+// @Description Delete an order by ID
+// @Tags orders
+// @Param id path uint true "Order ID"
+// @Success 204 "No Content"
+// @Failure 404 {object} utils.ErrorResponse
+// @Failure 500 {object} utils.ErrorResponse
+// @Router /orders/{id} [delete]
+func DeleteOrder(c *gin.Context) {
 	orderID := c.MustGet("orderID").(uint)
 
-	if _,err := repositories.GetByID(orderID); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Order not found",
-		})
-		return
-	}
-
-	if err := repositories.Delete(orderID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed to delete order",
-		})
+	err := services.DeleteOrder(orderID)
+	if err != nil {
+		if err == services.ErrOrderNotFound {
+			utils.RespondError(c, http.StatusNotFound, "ORDER_NOT_FOUND", "Order not found")
+			return
+		}
+		utils.RespondError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "Failed to delete order")
 		return
 	}
 
 	c.Status(http.StatusNoContent)
-
 }
