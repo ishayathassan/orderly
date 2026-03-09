@@ -17,11 +17,13 @@ package main
 import (
 	"orderly/oms-service/internal/database"
 	"orderly/oms-service/internal/handlers"
+	"orderly/oms-service/internal/metrics"
 	"orderly/oms-service/internal/middlewares"
 
-	_ "orderly/oms-service/docs" // swagger generated docs
+	_ "orderly/oms-service/docs"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -30,10 +32,19 @@ func main() {
 
 	database.InitDB()
 
+	metrics.RegisterMetrics()
+
 	router := gin.Default()
 
+
+
+	router.Use(middlewares.MetricsMiddleware())
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	// Swagger UI
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// OMS Routes
 	router.GET("/orders", handlers.GetOrders)
 	router.POST("/orders", handlers.CreateOrder)
 	router.GET("/orders/:id", middlewares.ValidateID(), handlers.GetOrderByID)

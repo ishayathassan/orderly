@@ -21,7 +21,7 @@ func GetOrderByID(c *gin.Context) {
 
 	order, err := services.GetOrderByID(orderID)
 	if err != nil {
-		if err == services.ErrOrderNotFound {
+		if err == utils.ErrOrderNotFound {
 			utils.RespondError(c, http.StatusNotFound, "ORDER_NOT_FOUND", "Order not found")
 			return
 		}

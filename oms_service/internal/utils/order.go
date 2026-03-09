@@ -1,6 +1,14 @@
 package utils
 
-import "github.com/gin-gonic/gin"
+import (
+	"errors"
+
+	"github.com/gin-gonic/gin"
+)
+
+
+var ErrOrderNotFound = errors.New("order not found")
+
 
 type ErrorResponse struct {
 	Code    string `json:"code,omitempty" example:"INVALID_REQUEST"`
