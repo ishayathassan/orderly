@@ -36,8 +36,7 @@ func main() {
 
 	router := gin.Default()
 
-
-
+	// Prometheus
 	router.Use(middlewares.MetricsMiddleware())
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 

@@ -2,6 +2,7 @@ package services
 
 import (
 	"orderly/auth-service/internal/auth"
+	"orderly/auth-service/internal/metrics"
 	"orderly/auth-service/internal/models"
 	"orderly/auth-service/internal/repository"
 	"orderly/auth-service/utils"
@@ -30,6 +31,7 @@ func Register(username, password string) (*models.User, error) {
 		return nil, err
 	}
 
+	metrics.UsersCreatedTotal.Inc()
 	return &user, nil
 }
 

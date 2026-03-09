@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"orderly/auth-service/internal/auth"
+	"orderly/auth-service/internal/metrics"
 	"orderly/auth-service/internal/repository"
 )
 
@@ -22,5 +23,6 @@ func Login(username, password string) (string, error) {
 		return "", err
 	}
 
+	metrics.TokensIssuedTotal.Inc()
 	return token, nil
 }
