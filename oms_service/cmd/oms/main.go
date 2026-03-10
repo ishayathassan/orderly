@@ -34,7 +34,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Println(".env file not found")
+		log.Println("No .env file found; using system environment variables")
 	}
 
 	database.InitDB()
@@ -57,5 +57,5 @@ func main() {
 	router.DELETE("/orders/:id", middlewares.ValidateID(), handlers.DeleteOrder)
 	router.PUT("/orders/:id",middlewares.ValidateID(), handlers.UpdateOrder)
 
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }

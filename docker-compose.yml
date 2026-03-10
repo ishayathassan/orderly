@@ -1,0 +1,91 @@
+services:
+  # OMS Postgres
+  postgres-oms:
+    image: postgres:15
+    container_name: postgres-oms
+    environment:
+      POSTGRES_USER: orderly-admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: orderly_oms
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-oms:/var/lib/postgresql/data
+    networks:
+      - oms-network
+
+  # Auth Postgres
+  postgres-auth:
+    image: postgres:15
+    container_name: postgres-auth
+    environment:
+      POSTGRES_USER: orderly-admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: orderly_auth
+    ports:
+      - "5433:5432" # Map to host 5433 so it doesn't conflict with OMS Postgres
+    volumes:
+      - pgdata-auth:/var/lib/postgresql/data
+    networks:
+      - oms-network
+
+  # OMS Service
+  oms-service:
+    image: oms-service:latest
+    container_name: oms-service
+    env_file:
+      - ./oms_service/.env
+    depends_on:
+      - postgres-oms
+    ports:
+      - "8080:8080"
+    networks:
+      - oms-network
+
+  # Auth Service
+  auth-service:
+    image: auth-service:latest
+    container_name: auth-service
+    env_file:
+      - ./auth_service/.env
+    depends_on:
+      - postgres-auth
+    ports:
+      - "8081:8081"
+    networks:
+      - oms-network
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - oms-network
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - oms-network
+
+volumes:
+  pgdata-oms:
+  pgdata-auth:
+  grafana-data:
+
+networks:
+  oms-network:
+    driver: bridge

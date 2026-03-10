@@ -34,7 +34,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Println(".env file not found")
+		log.Println("No .env file found; using system environment variables")
 	}
 	
 	database.InitDB()
@@ -55,5 +55,5 @@ func main() {
 	router.POST("/login", handlers.Login)
 
 
-	router.Run("localhost:8081")
+	router.Run(":8081")
 }
