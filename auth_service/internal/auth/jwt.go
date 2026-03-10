@@ -1,13 +1,15 @@
 package auth
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// In production, move this to an environment variable!
-var jwtKey = []byte("your_very_secret_key")
+var jwtSecret = os.Getenv("JWT_SECRET")
+
+var jwtKey = []byte(jwtSecret)
 
 type Claims struct {
 	UserID string `json:"user_id"`

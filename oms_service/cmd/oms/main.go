@@ -15,6 +15,7 @@
 package main
 
 import (
+	"log"
 	"orderly/oms-service/internal/database"
 	"orderly/oms-service/internal/handlers"
 	"orderly/oms-service/internal/metrics"
@@ -23,12 +24,18 @@ import (
 	_ "orderly/oms-service/docs"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(".env file not found")
+	}
 
 	database.InitDB()
 

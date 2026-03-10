@@ -15,11 +15,14 @@
 package main
 
 import (
+	"log"
 	_ "orderly/auth-service/docs" // import generated docs
 	"orderly/auth-service/internal/database"
 	"orderly/auth-service/internal/handlers"
 	"orderly/auth-service/internal/metrics"
 	middlwares "orderly/auth-service/internal/middlewares"
+
+	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -28,6 +31,12 @@ import (
 )
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println(".env file not found")
+	}
+	
 	database.InitDB()
 
 	metrics.RegisterMetrics()
