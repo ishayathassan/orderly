@@ -24,6 +24,7 @@ func GenerateToken(userID string, role string) (string, error) {
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			Issuer: "orderly-auth",
 		},
 	}
 

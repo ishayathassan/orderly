@@ -12,7 +12,7 @@ services:
     volumes:
       - pgdata-oms:/var/lib/postgresql/data
     networks:
-      - oms-network
+      - orderly-network
 
   # Auth Postgres
   postgres-auth:
@@ -23,11 +23,35 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: orderly_auth
     ports:
-      - "5433:5432" # Map to host 5433 so it doesn't conflict with OMS Postgres
+      - "5433:5432"
     volumes:
       - pgdata-auth:/var/lib/postgresql/data
     networks:
-      - oms-network
+      - orderly-network
+
+  # API Gateway
+  kong:
+    image: kong:3.4
+    container_name: kong-gateway
+    user: "0"
+    env_file:
+      - ./auth_service/.env
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+    networks:
+      - orderly-network
+    ports:
+      - "8000:8000" # Public API Port
+      - "8001:8001" # Admin API
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml
 
   # OMS Service
   oms-service:
@@ -37,10 +61,8 @@ services:
       - ./oms_service/.env
     depends_on:
       - postgres-oms
-    ports:
-      - "8080:8080"
     networks:
-      - oms-network
+      - orderly-network
 
   # Auth Service
   auth-service:
@@ -50,10 +72,8 @@ services:
       - ./auth_service/.env
     depends_on:
       - postgres-auth
-    ports:
-      - "8081:8081"
     networks:
-      - oms-network
+      - orderly-network
 
   # Prometheus
   prometheus:
@@ -64,7 +84,7 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - oms-network
+      - orderly-network
 
   # Grafana
   grafana:
@@ -79,7 +99,7 @@ services:
     depends_on:
       - prometheus
     networks:
-      - oms-network
+      - orderly-network
 
 volumes:
   pgdata-oms:
@@ -87,5 +107,5 @@ volumes:
   grafana-data:
 
 networks:
-  oms-network:
+  orderly-network:
     driver: bridge

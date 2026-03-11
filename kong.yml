@@ -1,0 +1,31 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: oms-api
+    url: http://oms-service:8080
+    routes:
+      - name: oms-route
+        paths:
+          - /api/oms
+        strip_path: true
+    plugins:
+      - name: jwt
+        config:
+          key_claim_name: iss
+
+  - name: auth-api
+    url: http://auth-service:8081
+    routes:
+      - name: auth-route
+        paths:
+          - /api/auth
+        strip_path: true
+
+consumers:
+  - username: orderly-frontend
+    jwt_secrets:
+      - key: orderly-auth
+        algorithm: HS256
+        # secret: ${{ env.JWT_SECRET }}
+        secret: "UUdPzeXlG5OaJB4Hedm8eMPHSkfh615R10kxHhf8wyg"
